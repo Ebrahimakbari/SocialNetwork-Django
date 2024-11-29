@@ -1,8 +1,10 @@
 from typing import Any
 from django import forms
 from django.core.exceptions import ValidationError
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserCreationForm
 
+User = get_user_model()
 
 class UserRegistrationForm(forms.Form):
     username = forms.CharField(label='Username',
@@ -49,20 +51,20 @@ class UserRegistrationForm(forms.Form):
     
 
 class LoginForm(forms.Form):
-    username = forms.CharField(label='Username',
-                            widget=forms.TextInput(attrs={
-                                'class':'form-control', 
-                                'placeholder':'username'
-                            }))
+    email = forms.EmailField(label='Email',
+                            widget=forms.EmailInput(attrs={
+                                'class':'form-control',
+                                'placeholder':'email'
+                                }))
     password1 = forms.CharField(label="Password",
                                 widget=forms.PasswordInput(attrs={
                                 'class':'form-control', 
                                 'placeholder':'password'
                                 }))
     
-    def clean_username(self):
-        username = self.cleaned_data.get('username', None)
-        user = User.objects.filter(username=username).exists()
-        if user:
-            return username
-        raise ValidationError('username is not correct or you are not registered!')
+    def clean_email(self):
+        email = self.cleaned_data.get('email', None)
+        user = User.objects.filter(email=email).exists()
+        if not user:
+            raise ValidationError('incorrect email or need register first!')
+        return email

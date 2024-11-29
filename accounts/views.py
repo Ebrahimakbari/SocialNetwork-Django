@@ -1,11 +1,11 @@
 from django.shortcuts import render,redirect
 from django.views import View
 from django.contrib.auth import login,logout,authenticate
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from .forms import UserRegistrationForm,LoginForm
 from django.contrib import messages
 
-
+User = get_user_model()
 
 
 class RegisterView(View):
@@ -39,8 +39,8 @@ class LoginView(View):
         form = self.form_class(request.POST)
         if form.is_valid():
             password = form.cleaned_data.get('password1', None)
-            username = form.cleaned_data.get('username', None)
-            user = User.objects.filter(username=username).first()
+            email = form.cleaned_data.get('email', None)
+            user = User.objects.filter(email=email).first()
             if user.check_password(password):
                 login(request,user)
                 messages.success(request,'user successfully login')
