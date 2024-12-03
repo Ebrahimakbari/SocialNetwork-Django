@@ -11,8 +11,7 @@
           <li class="nav-item">
             <a class="nav-link active" href="{% url "accounts:user_login" %}">Login</a>
           </li>
-        {% endif %}
-        {% if user.is_authenticated %}
+          {% else %}
           <li class="nav-item">
             <a class="nav-link active" href="{% url "accounts:user_logout" %}">Logout</a>
           </li>

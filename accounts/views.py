@@ -1,16 +1,21 @@
+from typing import Any
+from django.http import HttpRequest
+from django.http.response import HttpResponse as HttpResponse
 from django.shortcuts import render,redirect
 from django.views import View
 from django.contrib.auth import login,logout,authenticate
 from django.contrib.auth import get_user_model
 from .forms import UserRegistrationForm,LoginForm
 from django.contrib import messages
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required,user_passes_test,permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin,UserPassesTestMixin,PermissionRequiredMixin,AccessMixin
 
 User = get_user_model()
 
-
 class RegisterView(View):
     form_class = UserRegistrationForm
-    template_name = 'accounts/register.html'
+    template_name = 'accounts/register.html'\
     
     def get(self,request,*args, **kwargs):
         form = self.form_class()
@@ -26,7 +31,6 @@ class RegisterView(View):
 
         return render(request,self.template_name,context={'form':form})
     
-
 class LoginView(View):
     form_class = LoginForm
     template_name = 'accounts/login.html'
@@ -49,8 +53,7 @@ class LoginView(View):
         
         return render(request,self.template_name,context={'form':form})
     
-
-class LogoutView(View):
+class LogoutView(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             logout(request)
