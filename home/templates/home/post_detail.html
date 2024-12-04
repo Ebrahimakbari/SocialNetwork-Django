@@ -1,0 +1,17 @@
+{% extends "shared/base.html" %}
+
+{% block title %}Post Detail{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="container">
+                <h1>{{ post.title }}</h1>
+                <img src="{{ post.image.url }}" class="img-thumbnail" alt="{{ post.title }}" width=500>
+                <p>{{ post.content }}</p>
+                <p>Published by: {{ post.author.username }}</p>
+                <p>Published at: {{ post.created_at }}</p>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

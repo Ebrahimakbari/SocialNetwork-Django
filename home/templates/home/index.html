@@ -3,5 +3,23 @@
 {% block title %}Home{% endblock title %}
 
 {% block content %}
-    <p>home index</p>
+    <div class="container">
+        <h1>Posts</h1>
+        <div class="row">
+            {% for post in posts %}
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ post.title }}</h5>
+                            <p class="fw-light">Published by: {{ post.author.username }}</p>
+                            <p class="fw-light">Published at: {{ post.created_at }}</p>
+                            <p class="card-text">{{ post.content|truncatechars:100 }}</p>
+                            <a href="{% url "home:post_detail" pk=post.id %}" class="btn btn-primary">Read more</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock content %}
