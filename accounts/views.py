@@ -5,7 +5,7 @@ from django.shortcuts import render,redirect
 from django.views import View
 from django.contrib.auth import login,logout,authenticate
 from django.contrib.auth import get_user_model
-from .forms import UserRegistrationForm,LoginForm
+from .forms import UserRegistrationForm,LoginForm,UserPanelFormChange
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required,user_passes_test,permission_required
@@ -13,9 +13,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin,UserPassesTestMixin,Pe
 
 User = get_user_model()
 
+
+
 class RegisterView(View):
     form_class = UserRegistrationForm
-    template_name = 'accounts/register.html'\
+    template_name = 'accounts/register.html'
     
     def get(self,request,*args, **kwargs):
         form = self.form_class()
@@ -30,6 +32,7 @@ class RegisterView(View):
             return redirect('home:home')
 
         return render(request,self.template_name,context={'form':form})
+    
     
 class LoginView(View):
     form_class = LoginForm
@@ -53,9 +56,29 @@ class LoginView(View):
         
         return render(request,self.template_name,context={'form':form})
     
+    
 class LogoutView(LoginRequiredMixin,View):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             logout(request)
             messages.success(request, 'logout successfully!')
             return redirect('accounts:user_login')
+
+
+class UserPanelView(LoginRequiredMixin,View):
+    def get(self, request,*args, **kwargs):
+        user_id = kwargs.get('pk')
+        user = User.objects.get(id=user_id)
+        form = UserPanelFormChange(instance=user)
+        return render(request,'accounts/user_panel.html',{'form':form})
+    
+    def post(self, request, *args, **kwargs):
+        user_id = kwargs.get('pk')
+        user = User.objects.get(id=user_id)
+        form = UserPanelFormChange(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully!')
+            return redirect('home:home')
+        messages.error(request,'invalid data')
+        return render(request,'accounts/user_panel.html',{'form':form})

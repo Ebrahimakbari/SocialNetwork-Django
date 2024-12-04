@@ -2,7 +2,7 @@ from typing import Any
 from django import forms
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm,UserChangeForm
 
 User = get_user_model()
 
@@ -68,3 +68,9 @@ class LoginForm(forms.Form):
         if not user:
             raise ValidationError('incorrect email or need register first!')
         return email
+    
+
+class UserPanelFormChange(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name','last_name','phone_number','avatar']
