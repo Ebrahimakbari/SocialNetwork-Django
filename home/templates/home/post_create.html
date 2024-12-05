@@ -1,0 +1,40 @@
+{% extends "shared/base.html" %}
+
+{% block title %}Post Create{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="container">
+                <form action="{% url "home:post_create" %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas"></i></span>
+                            {{ form.title }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Content</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas"></i></span>
+                            {{ form.content }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas"></i></span>
+                            {{ form.status }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.image }}
+                    </div>
+                    <input type="submit" value="Create" class="btn btn-primary btn-sm">
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

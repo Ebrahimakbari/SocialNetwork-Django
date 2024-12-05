@@ -14,8 +14,8 @@
                             <h5 class="card-title">{{ post.title }}</h5>
                             <p class="fw-light">Published by: {{ post.author.username }}</p>
                             <p class="fw-light">Published at: {{ post.created_at }}</p>
-                            <p class="card-text">{{ post.content|truncatechars:100 }}</p>
-                            <a href="{% url "home:post_detail" pk=post.id %}" class="btn btn-primary">Read more</a>
+                            <p class="card-text">{{ post.content|truncatewords:20 }}</p>
+                            <a href="{% url "home:post_detail" pk=post.id post_slug=post.slug %}" class="btn btn-primary">Read more</a>
                         </div>
                     </div>
                 </div>

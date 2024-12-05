@@ -18,6 +18,9 @@
           <li class="nav-item">
             <a class="nav-link active" href="{% url "accounts:user_panel" pk=user.id%}">User panel</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="{% url "home:post_create" %}">Create post</a>
+          </li>
           {% if user.avatar %}
             <li class="nav-item">
               <a class="nav-link active" href="{% url "accounts:user_panel" pk=user.id%}"><img src="{{ user.avatar.url }}" class="img-thumbnail" width=40></a>

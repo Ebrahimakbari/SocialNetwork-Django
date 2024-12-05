@@ -68,9 +68,10 @@ class LogoutView(LoginRequiredMixin,View):
 class UserPanelView(LoginRequiredMixin,View):
     def get(self, request,*args, **kwargs):
         user_id = kwargs.get('pk')
-        user = User.objects.get(id=user_id)
+        user = User.objects.prefetch_related('posts').get(id=user_id)
         form = UserPanelFormChange(instance=user)
-        return render(request,'accounts/user_panel.html',{'form':form})
+        posts = user.posts.all()
+        return render(request,'accounts/user_panel.html',{'form':form,'posts':posts})
     
     def post(self, request, *args, **kwargs):
         user_id = kwargs.get('pk')
