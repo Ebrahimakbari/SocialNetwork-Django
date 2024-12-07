@@ -1,4 +1,4 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.http.response import HttpResponse
 from django.urls import reverse
 from django.views import View
@@ -18,14 +18,14 @@ class HomeView(View):
 class PostDetailView(View):
     def get(self,request,*args, **kwargs):
         post_pk = kwargs.get('pk')
-        post = Post.published.get(pk=post_pk)
+        post = get_object_or_404(Post, pk=post_pk)
         return render(request, 'home/post_detail.html',context={'post':post})
 
 
 class PostEditView(LoginRequiredMixin, View):
     def setup(self, request, *args, **kwargs):
         post_pk = kwargs.get('pk')
-        self.post_instance = Post.objects.get(pk=post_pk)
+        self.post_instance = get_object_or_404(Post, pk=post_pk)
         return super().setup(request, *args, **kwargs)
     
     def dispatch(self, request, *args, **kwargs):
@@ -73,7 +73,7 @@ class PostCreateView(LoginRequiredMixin, View):
 class PostDeleteView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         post_id = kwargs.get('pk')
-        post = Post.objects.get(id=post_id)
+        post = get_object_or_404(Post, id=post_id)
         if post.author.id != request.user.id:
             messages.error(request, 'you cant delete this post!!')
             return redirect('home:home')

@@ -1,7 +1,7 @@
 from typing import Any
 from django.http import HttpRequest
 from django.http.response import HttpResponse as HttpResponse
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect, get_object_or_404
 from django.views import View
 from django.contrib.auth import login,logout,authenticate
 from django.contrib.auth import get_user_model
@@ -75,7 +75,7 @@ class UserPanelView(LoginRequiredMixin, View):
     
     def post(self, request, *args, **kwargs):
         user_id = kwargs.get('pk')
-        user = User.objects.get(id=user_id)
+        user = get_object_or_404(User, id=user_id)
         form = UserPanelFormChange(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
