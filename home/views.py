@@ -5,6 +5,7 @@ from django.views import View
 from .models import Post
 from .forms import PostForm
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 # Create your views here.
 
 
@@ -21,16 +22,26 @@ class PostDetailView(View):
         return render(request, 'home/post_detail.html',context={'post':post})
 
 
-class PostEditView(View):
-    def get(self, request, *args, **kwargs):
+class PostEditView(LoginRequiredMixin, View):
+    def setup(self, request, *args, **kwargs):
         post_pk = kwargs.get('pk')
-        post = Post.objects.get(pk=post_pk)
+        self.post_instance = Post.objects.get(pk=post_pk)
+        return super().setup(request, *args, **kwargs)
+    
+    def dispatch(self, request, *args, **kwargs):
+        post = self.post_instance
+        if post.author.id != request.user.id:
+            messages.error(request, 'you cant update this post!!')
+            return redirect('home:home')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get(self, request, *args, **kwargs):
+        post = self.post_instance
         form = PostForm(instance=post)
         return render(request, 'home/post_edit.html', {'form':form,'post':post})
     
     def post(self, request, *args, **kwargs):
-        post_pk = kwargs.get('pk')
-        post = Post.objects.get(pk=post_pk)
+        post = self.post_instance
         form = PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             instance = form.save(commit=False)
@@ -42,7 +53,7 @@ class PostEditView(View):
         return render(request, 'home/post_edit.html', {'form':form,'post':post})
     
 
-class PostCreateView(View):
+class PostCreateView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         form = PostForm()
         return render(request, 'home/post_create.html',{'form':form})
@@ -59,10 +70,13 @@ class PostCreateView(View):
         return render(request, 'home/post_create.html', {'form':form})
 
 
-class PostDeleteView(View):
+class PostDeleteView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         post_id = kwargs.get('pk')
         post = Post.objects.get(id=post_id)
+        if post.author.id != request.user.id:
+            messages.error(request, 'you cant delete this post!!')
+            return redirect('home:home')
         post.delete()
         messages.success(request, 'post successfully deleted!!')
         return redirect('home:home')

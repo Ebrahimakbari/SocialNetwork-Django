@@ -4,7 +4,7 @@
         <li class="nav-item">
           <a class="nav-link active" href="{% url "home:home" %}">Home</a>
         </li>
-        {% if not user.is_authenticated %}
+        {% if not request.user.is_authenticated %}
           <li class="nav-item">
             <a class="nav-link active" href="{% url "accounts:user_register" %}">Register</a>
           </li>
@@ -16,14 +16,14 @@
             <a class="nav-link active" href="{% url "accounts:user_logout" %}">Logout</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link active" href="{% url "accounts:user_panel" pk=user.id%}">User panel</a>
+            <a class="nav-link active" href="{% url "accounts:user_panel" pk=request.user.id%}">User panel</a>
           </li>
           <li class="nav-item">
             <a class="nav-link active" href="{% url "home:post_create" %}">Create post</a>
           </li>
-          {% if user.avatar %}
+          {% if request.user.avatar %}
             <li class="nav-item">
-              <a class="nav-link active" href="{% url "accounts:user_panel" pk=user.id%}"><img src="{{ user.avatar.url }}" class="img-thumbnail" width=40></a>
+              <a class="nav-link active" href="{% url "accounts:user_panel" pk=request.user.id%}"><img src="{{ request.user.avatar.url }}" class="img-thumbnail" width=40></a>
             </li>
           {% endif %}
         {% endif %}

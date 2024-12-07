@@ -57,7 +57,7 @@ class LoginView(View):
         return render(request,self.template_name,context={'form':form})
     
     
-class LogoutView(LoginRequiredMixin,View):
+class LogoutView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             logout(request)
@@ -65,7 +65,7 @@ class LogoutView(LoginRequiredMixin,View):
             return redirect('accounts:user_login')
 
 
-class UserPanelView(LoginRequiredMixin,View):
+class UserPanelView(LoginRequiredMixin, View):
     def get(self, request,*args, **kwargs):
         user_id = kwargs.get('pk')
         user = User.objects.prefetch_related('posts').get(id=user_id)
