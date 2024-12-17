@@ -9,6 +9,13 @@
             {% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="login" class="btn btn-primary btn-sm">
-        </form>
+        </form>  
+    </div>
+    <div
+        class="d-flex justify-content-center align-items-center w-auto"
+        >
+        <a href="{% url "accounts:reset_password" %}" class="alert alert-primary">
+            Forget password!!
+        </a>
     </div>
 {% endblock content %}

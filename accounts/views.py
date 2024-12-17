@@ -6,13 +6,14 @@ from django.shortcuts import render,redirect, get_object_or_404
 from django.views import View
 from django.contrib.auth import login,logout,authenticate
 from django.contrib.auth import get_user_model
-from .forms import UserRegistrationForm,LoginForm,UserPanelFormChange,ResetPasswordForm,ChangePasswordForm
+from .forms import UserRegistrationForm,LoginForm,UserPanelFormChange,ResetPasswordForm,ChangePasswordForm,ForgetPasswordForm
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required,user_passes_test,permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin,UserPassesTestMixin,PermissionRequiredMixin,AccessMixin
 from django.utils.crypto import get_random_string
 from django.core.mail import send_mail
+
 User = get_user_model()
 
 
@@ -93,34 +94,50 @@ class UserPanelView(LoginRequiredMixin, View):
 #     ["to@example.com"],
 #     fail_silently=False,
 # )
+    
+class ResetPasswordView(View):
+    def setup(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            self.user_form = ResetPasswordForm
+        else:
+            self.user_form = ForgetPasswordForm
+        return super().setup(request, *args, **kwargs)
 
-class ResetPasswordView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        form = ResetPasswordForm()
+        form = self.user_form()
         return render(request, "accounts/reset_password.html", context={'form':form})
         
     def post(self, request, *args, **kwargs):
-        form = ResetPasswordForm(request.POST)
+        form = self.user_form(request.POST)
         if form.is_valid():
             user_email = form.cleaned_data.get('email', None)
             user = User.objects.get(email=user_email)
             user.token = get_random_string(length=32)
             user.save()
-            send_mail('password reset link',
-                    f"click on this http://{request.META['HTTP_HOST']}/accounts/change-password/{user.token}/ link to redirect to pass reset page",
-                    settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[f"{user.email}"],
-                    fail_silently=False,)
-            messages.success(request, 'check your email box to reset ur password!')
+            try:
+                send_mail('password reset link',
+                        f"""click on this
+                        http://{request.META['HTTP_HOST']}/accounts/change-password/{user.pk}/{user.token}/
+                        link to redirect to pass reset page""",
+                        settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[f"{user.email}"],
+                        fail_silently=False,)
+                messages.success(request, 'check your email box to reset ur password!')
+            except:
+                messages.error(request, "failed to send link to ur email!!!")
             return redirect('home:home')
         return render(request, "accounts/reset_password.html", context={'form':form})
     
 
 
-class ChangePasswordView(LoginRequiredMixin, View):
+class ChangePasswordView(View):
+    def setup(self, request, *args, **kwargs):
+        self.user_pk = kwargs.get('pk', None)
+        return super().setup(request, *args, **kwargs)
+    
     def dispatch(self, request, *args, **kwargs):
         token = kwargs.get('token', None)
-        user_token = request.user.token
+        user_token = User.objects.get(pk=self.user_pk).token
         if user_token != token:
             messages.error(request, 'invalid token!!')
             return redirect('home:home')
@@ -133,7 +150,7 @@ class ChangePasswordView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         form = ChangePasswordForm(request.POST)
         if form.is_valid():
-            user = request.user
+            user = User.objects.get(pk=self.user_pk)
             n_password = form.cleaned_data.get('password1', None)
             if n_password:
                 user.set_password(n_password)

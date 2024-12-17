@@ -3,7 +3,17 @@
 {% block title %}User panel{% endblock title %}
 
 {% block content %}
-<h2 class="text-center">User panel</h2>
+    <h2 class="text-center">User panel</h2>
+    <br>
+    <div class="register-form d-flex justify-content-center align-items-center">
+        <button
+            type="button"
+            class="btn btn-primary"
+        >
+        <a class="nav-link active" href="{% url "accounts:reset_password"%}">Reset password</a>
+        </button>
+    </div>
+    <br>
     {% if request.user.avatar %}
     <div class='d-flex justify-content-center align-items-center'>
         <img src="{{ request.user.avatar.url }}" alt="" width=400 class="img-thumbnail">

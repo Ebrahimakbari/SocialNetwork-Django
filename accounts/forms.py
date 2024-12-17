@@ -77,11 +77,13 @@ class UserPanelFormChange(forms.ModelForm):
 
 
 class ResetPasswordForm(forms.Form):
-    email = forms.EmailField(label="Email", widget=forms.EmailInput(attrs={
+    email = forms.EmailField(label="Email",
+                            widget=forms.EmailInput(attrs={
         "class":"form-control",
         "placeholder":"Email"
     }))
-    password = forms.CharField(label="Password", widget=forms.PasswordInput(attrs={
+    password = forms.CharField(label="Password",
+                            widget=forms.PasswordInput(attrs={
         "class":"form-control",
         "placeholder":"password"
     }))
@@ -92,7 +94,30 @@ class ResetPasswordForm(forms.Form):
         email = clean_data.get('email',None)
         password = clean_data.get('password',None)
         user = User.objects.filter(email=email)
-        if not (email and password and user.exists and user.first().check_password(password)):
+        if not (
+            email and
+            password and
+            user.exists and
+            user.first().check_password(password)
+            ):
+            raise ValidationError('invalid pass or email!!')
+
+
+class ForgetPasswordForm(forms.Form):
+    email = forms.EmailField(label="Email",
+                            widget=forms.EmailInput(attrs={
+        "class":"form-control",
+        "placeholder":"Email"
+    }))
+    
+    def clean(self):
+        clean_data = super().clean()
+        email = clean_data.get('email',None)
+        user = User.objects.filter(email=email)
+        if not (
+            email and
+            user.exists
+            ):
             raise ValidationError('invalid pass or email!!')
 
 
