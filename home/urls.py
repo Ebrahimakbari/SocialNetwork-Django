@@ -8,4 +8,6 @@ urlpatterns = [
     path('edit/<int:pk>/<slug:post_slug>/',views.PostEditView.as_view(),name='post_edit'),
     path('create/',views.PostCreateView.as_view(),name='post_create'),
     path('delete/<int:pk>/',views.PostDeleteView.as_view(),name='post_delete'),
+    path('follow/<int:pk>/',views.FollowingView.as_view(),name='user_follow'),
+    path('unfollow/<int:pk>/',views.UnFollowingView.as_view(),name='user_unfollow'),
 ]

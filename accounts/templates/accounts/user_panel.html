@@ -20,7 +20,8 @@
     </div>
     {% endif %}
     <div class="register-form d-flex justify-content-center align-items-center">
-        <form action="{% url "accounts:user_panel" pk=request.user.id %}" method="post" class="col-md-3" enctype="multipart/form-data">
+        <form action="{% url "accounts:user_panel" pk=request.user.id %}" 
+            method="post" class="col-md-3" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="mb-3">
                 <label for="full_name" class="form-label">First Name</label>

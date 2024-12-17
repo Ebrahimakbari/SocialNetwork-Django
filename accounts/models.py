@@ -30,3 +30,16 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = ("user")
         verbose_name_plural = ("users")
+        
+        
+class Relation(models.Model):
+    from_user = models.ForeignKey(CustomUser, related_name='followings', on_delete=models.CASCADE)
+    to_user = models.ForeignKey(CustomUser, related_name='follower', on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = ("Relation")
+        verbose_name_plural = ("Relations")
+
+    def __str__(self):
+        return f'{self.from_user} following {self.to_user}'

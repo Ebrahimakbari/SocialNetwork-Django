@@ -6,6 +6,11 @@ from .models import Post
 from .forms import PostForm
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from accounts.models import Relation
+from django.contrib.auth import get_user_model
+
+
+User = get_user_model()
 # Create your views here.
 
 
@@ -80,3 +85,28 @@ class PostDeleteView(LoginRequiredMixin, View):
         post.delete()
         messages.success(request, 'post successfully deleted!!')
         return redirect('home:home')
+    
+    
+class FollowingView(View):
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get('pk', None)
+        to_user = User.objects.get(pk=pk)
+        following , created = Relation.objects.get_or_create(to_user=to_user, from_user=request.user)
+        if created:
+            messages.success(request, f'user {to_user} is added to your following list!!')
+        else:
+            messages.error(request, f'you already following {to_user} user!!')
+        return redirect('accounts:user_panel', pk=pk)
+    
+    
+class UnFollowingView(View):
+    def get(self, request, *args, **kwargs):
+        pk = kwargs.get('pk', None)
+        to_user = User.objects.get(pk=pk)
+        following = Relation.objects.filter(to_user=to_user, from_user=request.user)
+        if following.exists:
+            following.first().delete()
+            messages.success(request, f'you successfully unfollowed user {to_user} ')
+        else:
+            messages.error(request, f'you are not following {to_user} user!!')
+        return redirect('accounts:user_panel', pk=pk)

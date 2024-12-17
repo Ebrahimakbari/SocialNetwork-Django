@@ -9,10 +9,12 @@
             {% for post in posts %}
                 <div class="col-md-4">
                     <div class="card mb-4">
-                        <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
+                        <a href='{% url "accounts:user_panel" pk=post.author.pk %}'>
+                            <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
+                        </a>
                         <div class="card-body">
                             <h5 class="card-title">{{ post.title }}</h5>
-                            <p class="fw-light">Published by: {{ post.author.username }}</p>
+                            <p class="fw-light">Published by: <a class="btn btn-outline-danger" href="{% url "accounts:user_panel" pk=post.author.pk %}">{{ post.author.username }}</a></p>
                             <p class="fw-light">Published at: {{ post.created_at }}</p>
                             <p class="card-text">{{ post.content|truncatewords:20 }}</p>
                             <a href="{% url "home:post_detail" pk=post.id post_slug=post.slug %}" class="btn btn-primary">Read more</a>

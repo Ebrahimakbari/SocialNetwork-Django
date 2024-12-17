@@ -13,6 +13,7 @@ from django.contrib.auth.decorators import login_required,user_passes_test,permi
 from django.contrib.auth.mixins import LoginRequiredMixin,UserPassesTestMixin,PermissionRequiredMixin,AccessMixin
 from django.utils.crypto import get_random_string
 from django.core.mail import send_mail
+from .models import Relation
 
 User = get_user_model()
 
@@ -69,6 +70,15 @@ class LogoutView(LoginRequiredMixin, View):
 
 
 class UserPanelView(LoginRequiredMixin, View):
+    def dispatch(self, request, *args, **kwargs):
+        user_id = kwargs.get('pk')
+        to_user = get_object_or_404(User, pk=user_id)
+        is_follow = Relation.objects.filter(to_user=to_user, from_user=request.user).exists()
+        posts = to_user.posts.all()
+        if request.user != to_user:
+            return render(request,'accounts/user_panel_read.html',{'posts':posts, 'is_follow':is_follow, "to_user":to_user})
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request,*args, **kwargs):
         user_id = kwargs.get('pk')
         user = User.objects.prefetch_related('posts').get(id=user_id)
@@ -86,7 +96,8 @@ class UserPanelView(LoginRequiredMixin, View):
             return redirect('home:home')
         messages.error(request,'invalid data')
         return render(request,'accounts/user_panel.html',{'form':form})
-    
+
+
 # send_mail(
 #     "Subject here",
 #     "Here is the message.",
@@ -94,7 +105,7 @@ class UserPanelView(LoginRequiredMixin, View):
 #     ["to@example.com"],
 #     fail_silently=False,
 # )
-    
+
 class ResetPasswordView(View):
     def setup(self, request, *args, **kwargs):
         if request.user.is_authenticated:

@@ -34,6 +34,7 @@ class Post(models.Model):
     class Meta:
         verbose_name = ("Post")
         verbose_name_plural = ("Posts")
+        ordering = ["-created_at"]
 
     def __str__(self):
         return self.title
@@ -44,4 +45,3 @@ class Post(models.Model):
     
     def get_absolute_url(self):
         return reverse("home:post_edit", kwargs={"pk": self.pk,"post_slug":self.slug})
-    
