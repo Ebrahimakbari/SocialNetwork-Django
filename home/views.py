@@ -87,7 +87,7 @@ class PostDeleteView(LoginRequiredMixin, View):
         return redirect('home:home')
     
     
-class FollowingView(View):
+class FollowingView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         pk = kwargs.get('pk', None)
         to_user = User.objects.get(pk=pk)
@@ -99,7 +99,7 @@ class FollowingView(View):
         return redirect('accounts:user_panel', pk=pk)
     
     
-class UnFollowingView(View):
+class UnFollowingView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         pk = kwargs.get('pk', None)
         to_user = User.objects.get(pk=pk)
