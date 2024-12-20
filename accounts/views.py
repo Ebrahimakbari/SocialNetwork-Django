@@ -42,6 +42,10 @@ class LoginView(View):
     form_class = LoginForm
     template_name = 'accounts/login.html'
     
+    def setup(self, request, *args, **kwargs):
+        self.next = request.GET.get('next')
+        return super().setup(request, *args, **kwargs)
+    
     def get(self,request,*args, **kwargs):
         form = self.form_class()
         return render(request,self.template_name,context={'form':form})
@@ -55,6 +59,8 @@ class LoginView(View):
             if user.check_password(password):
                 login(request,user)
                 messages.success(request,'user successfully login')
+                if self.next:
+                    return redirect(self.next)
                 return redirect('home:home')
             messages.error(request,'incorrect password!!')
         
@@ -73,7 +79,10 @@ class UserPanelView(LoginRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
         user_id = kwargs.get('pk')
         to_user = get_object_or_404(User, pk=user_id)
-        is_follow = Relation.objects.filter(to_user=to_user, from_user=request.user).exists()
+        request_user = request.user
+        is_follow = None
+        if request_user.is_authenticated:
+            is_follow = Relation.objects.filter(to_user=to_user, from_user=request.user).exists()
         posts = to_user.posts.all()
         if request.user != to_user:
             return render(request,'accounts/user_panel_read.html',{'posts':posts, 'is_follow':is_follow, "to_user":to_user})

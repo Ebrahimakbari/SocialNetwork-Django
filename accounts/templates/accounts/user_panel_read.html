@@ -7,11 +7,11 @@
     <br>
     <br>
     <div class="container">
-        {% if not is_follow %}
+        {% if  is_follow == False %}
             <div>
                 <a class="btn btn-primary" href="{% url "home:user_follow" pk=to_user.pk %}">Follow</a>
             </div>
-        {% else %}
+        {% elif  is_follow == True%}
             <div>
                 <a class="btn btn-primary" href="{% url "home:user_unfollow" pk=to_user.pk %}">Unfollow</a>
             </div>
