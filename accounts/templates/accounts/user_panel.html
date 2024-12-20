@@ -3,8 +3,37 @@
 {% block title %}User panel{% endblock title %}
 
 {% block content %}
-    <h2 class="text-center">User panel</h2>
-    <br>
+    <h2 class="text-center">User panel :  {{ request.user }} </h2>
+    <div class="row">
+    <h4 class="card-title">followers:{{ followers.count }}</h4>
+    {% for follower in followers  %}
+        <div class="col-2">
+            <div class="card">
+                <div class="card-body">
+                    <a class="btn btn-outline-primary" href="{{follower.from_user.get_absolute_url}}">
+                        <h3 class="card-title card-link">{{ follower.from_user }}</h3>
+                        <p class="card-title card-link">{{ follower.created }}</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+<br>
+    <div class="row">
+    <h4 class="card-title">followings:{{ followings.count }}</h4>
+    {% for follow in followings  %}
+        <div class="col-2">
+            <div class="card">
+                <div class="card-body">
+                    <a class="btn btn-outline-primary" href="{{follow.to_user.get_absolute_url}}">
+                        <h3 class="card-title card-link">{{ follow.to_user }}</h3>
+                        <p class="card-title card-link">{{ follow.created }}</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+<br>
     <div class="register-form d-flex justify-content-center align-items-center">
         <button
             type="button"

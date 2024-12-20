@@ -82,9 +82,11 @@ class UserPanelView(LoginRequiredMixin, View):
     def get(self, request,*args, **kwargs):
         user_id = kwargs.get('pk')
         user = User.objects.prefetch_related('posts').get(id=user_id)
+        followers = user.follower.all()
+        followings = user.followings.all()
         form = UserPanelFormChange(instance=user)
         posts = user.posts.all()
-        return render(request,'accounts/user_panel.html',{'form':form,'posts':posts})
+        return render(request,'accounts/user_panel.html',{'form':form,'posts':posts,'followings':followings,'followers':followers})
     
     def post(self, request, *args, **kwargs):
         user_id = kwargs.get('pk')

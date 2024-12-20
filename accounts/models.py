@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager,AbstractUser,PermissionsMixin
+from django.urls import reverse
 from .managers import CustomUserManager
 # Create your models here.
 
@@ -30,6 +31,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = ("user")
         verbose_name_plural = ("users")
+        
+    def get_absolute_url(self):
+        return reverse("accounts:user_panel", kwargs={"pk": self.pk})
+    
         
         
 class Relation(models.Model):
