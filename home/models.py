@@ -45,3 +45,19 @@ class Post(models.Model):
     
     def get_absolute_url(self):
         return reverse("home:post_edit", kwargs={"pk": self.pk,"post_slug":self.slug})
+    
+    
+class Comment(models.Model):
+    user = models.ForeignKey(User, related_name='comments', on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
+    reply = models.ForeignKey("self", related_name="replys", on_delete=models.CASCADE, null=True, blank=True)
+    is_reply = models.BooleanField(default=False)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = ("Comment")
+        verbose_name_plural = ("Comments")
+
+    def __str__(self):
+        return f'{self.user} on post {self.post}'

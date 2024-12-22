@@ -12,6 +12,61 @@
                 <p>{{ post.content }}</p>
                 <p>Published by: {{ post.author.username }}</p>
                 <p>Published at: {{ post.created_at }}</p>
+                <hr>
+                <h3>add comments</h3>
+                {% if request.user.is_authenticated %}
+                    <form method="post">
+                        {% csrf_token %}
+                                {{ form.as_p }}
+                        <input type="submit" value="add comment" class="btn btn-primary"/>
+                    </form>
+                {% else %}
+                    <h5 class='text-danger'>only logged in users can add comments!!</h5>
+                {% endif %}
+                <hr>
+                <br>
+                <h3>comments ({{ comments.count }})</h3>
+                {% for comment in comments %}
+                    <div class="row">
+                        <div class="card">
+                            <div class="card-body">
+                                <h3 class="card-title">
+                                    user: {{ comment.user }} | {{ comment.created_at|timesince }} ago  
+                                {% if request.user == comment.user %}
+                                    <a href="{% url "home:delete_comment" post_pk=post.pk comment_pk=comment.pk%}">
+                                        <input type="submit" value="Delete comment" class='btn btn-warning'>
+                                    </a>
+                                {% endif %}
+                            </h3>
+                            <p class="card-text">{{ comment.content }}</p>
+                            <hr>
+                            replies({{ comment.replys.count }})
+                            {% for reply in comment.replys.all %}
+                            <div class="card-body m-5 p-3">
+                                <h5 class="card-title">{{ reply.user }} | {{ reply.created_at|timesince }}
+                                            {% if request.user == reply.user %}
+                                                <a href="{% url "home:delete_comment" post_pk=post.pk comment_pk=reply.pk%}">
+                                                    <input type="submit" value="Delete comment" class='btn btn-warning'>
+                                                </a>
+                                            {% endif %}
+                                        </h5>
+                                        <p class="card-text">{{ reply.content }}</p>
+                                    </div>
+                                {% endfor %}
+                                <hr>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    {% empty %}
+                    <div class="row">
+                        <div class="card">
+                            <div class="card-body">
+                                <h3 class="card-title">No comments yet!!</h3>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>

@@ -1,17 +1,16 @@
 from django.shortcuts import redirect, render, get_object_or_404
-from django.http.response import HttpResponse
-from django.urls import reverse
 from django.views import View
 from .models import Post
-from .forms import PostForm
+from .forms import PostForm,CommentForm
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from accounts.models import Relation
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 
 User = get_user_model()
-# Create your views here.
 
 
 class HomeView(View):
@@ -21,10 +20,32 @@ class HomeView(View):
 
 
 class PostDetailView(View):
-    def get(self,request,*args, **kwargs):
+    form_class = CommentForm
+    
+    def setup(self, request, *args, **kwargs):
         post_pk = kwargs.get('pk')
-        post = get_object_or_404(Post, pk=post_pk)
-        return render(request, 'home/post_detail.html',context={'post':post})
+        self.post_instance = get_object_or_404(Post, pk=post_pk)
+        return super().setup(request, *args, **kwargs)
+    
+    def get(self,request,*args, **kwargs):
+        form = self.form_class()
+        comments = self.post_instance.comments.filter(is_reply=False)
+        return render(request, 'home/post_detail.html',context={'post':self.post_instance,'comments':comments, 'form':form})
+    
+    @method_decorator(login_required)
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        post = self.post_instance
+        if form.is_valid:
+            instance = form.save(commit=False)
+            instance.user = request.user
+            instance.post = post
+            instance.save()
+            messages.success(request, 'comment added to the post!')
+            return redirect('home:post_detail',pk=post.pk, post_slug=post.slug)
+        messages.warning(request, 'an error accrued on creating comment check your inputs please!!')
+        return redirect('home:post_detail',pk=post.pk, post_slug=post.slug)
+        
 
 
 class PostEditView(LoginRequiredMixin, View):
@@ -110,3 +131,17 @@ class UnFollowingView(LoginRequiredMixin, View):
         else:
             messages.error(request, f'you are not following {to_user} user!!')
         return redirect('accounts:user_panel', pk=pk)
+    
+
+class DeleteCommentView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        post_pk = kwargs.get('post_pk')
+        comment_pk = kwargs.get('comment_pk')
+        post = get_object_or_404(Post, pk=post_pk)
+        comment = post.comments.get(pk=comment_pk)
+        if comment and comment.user == request.user:
+            comment.delete()
+            messages.success(request, 'message removed!!')
+            return redirect('home:post_detail', pk=post.pk, post_slug=post.slug)
+        messages.error(request, 'invalid request!!')
+        return redirect('home:post_detail',pk=post.pk, post_slug=post.slug)
