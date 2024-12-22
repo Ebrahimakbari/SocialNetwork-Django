@@ -15,9 +15,10 @@
                 <hr>
                 <h3>add comments</h3>
                 {% if request.user.is_authenticated %}
-                    <form method="post">
+                    <form method="post" id='comment_form'>
                         {% csrf_token %}
-                                {{ form.as_p }}
+                        <input name='parent' type="hidden" id='parent_id' value=''>
+                        {{ form.as_p }}
                         <input type="submit" value="add comment" class="btn btn-primary"/>
                     </form>
                 {% else %}
@@ -39,6 +40,7 @@
                                 {% endif %}
                             </h3>
                             <p class="card-text">{{ comment.content }}</p>
+                            <a class="btn btn-primary" onclick="GetParent({{comment.id}})"><i class="fa fa-reply"></i>reply</a>
                             <hr>
                             replies({{ comment.replys.count }})
                             {% for reply in comment.replys.all %}

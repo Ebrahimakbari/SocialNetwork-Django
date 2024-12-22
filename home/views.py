@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
-from .models import Post
+from .models import Post, Comment
 from .forms import PostForm,CommentForm
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -40,6 +40,10 @@ class PostDetailView(View):
             instance = form.save(commit=False)
             instance.user = request.user
             instance.post = post
+            parent_id = request.POST.get('parent',None)
+            if parent_id:
+                instance.reply = Comment.objects.get(pk=parent_id)
+                instance.is_reply = True
             instance.save()
             messages.success(request, 'comment added to the post!')
             return redirect('home:post_detail',pk=post.pk, post_slug=post.slug)
