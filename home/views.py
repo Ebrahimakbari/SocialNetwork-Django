@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
-from .models import Post, Comment
+from .models import Post, Comment, PostLike
 from .forms import PostForm,CommentForm
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -30,7 +30,15 @@ class PostDetailView(View):
     def get(self,request,*args, **kwargs):
         form = self.form_class()
         comments = self.post_instance.comments.filter(is_reply=False)
-        return render(request, 'home/post_detail.html',context={'post':self.post_instance,'comments':comments, 'form':form})
+        if request.user.is_authenticated:
+            post_like = PostLike.objects.filter(user=request.user,post=self.post_instance).first()
+        else:
+            post_like = None
+        return render(
+            request, 
+            'home/post_detail.html',
+            context={'post':self.post_instance,'comments':comments, 'form':form, 'post_like':post_like}
+            )
     
     @method_decorator(login_required)
     def post(self, request, *args, **kwargs):
@@ -149,3 +157,16 @@ class DeleteCommentView(LoginRequiredMixin, View):
             return redirect('home:post_detail', pk=post.pk, post_slug=post.slug)
         messages.error(request, 'invalid request!!')
         return redirect('home:post_detail',pk=post.pk, post_slug=post.slug)
+    
+
+class PostLikeView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        post_pk = kwargs.get('pk', None)
+        post = get_object_or_404(Post, pk=post_pk)
+        post_like, created = PostLike.objects.get_or_create(user=request.user,post=post)
+        if created:
+            post_like.is_liked = True
+        else:
+            post_like.is_liked = not post_like.is_liked
+        post_like.save()
+        return redirect('home:post_detail', pk=post_pk, post_slug=post.slug)

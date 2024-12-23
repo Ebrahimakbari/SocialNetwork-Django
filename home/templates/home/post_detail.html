@@ -12,6 +12,22 @@
                 <p>{{ post.content }}</p>
                 <p>Published by: {{ post.author.username }}</p>
                 <p>Published at: {{ post.created_at }}</p>
+                <p>likes: {{ post.get_likes_count }}</p>
+                {% if request.user.is_authenticated %}
+                    <a href="{% url "home:post_like" pk=post.pk %}">
+                        {% if not post_like %}
+                            <button type="button" class="btn btn-outline-danger btn-nohover">Like</button>
+                        {% else %}
+                            <button 
+                            type="button" 
+                            class="btn {% if post_like.is_liked %}btn-danger{% else %}btn-outline-danger{% endif %} btn-nohover">
+                                Like
+                            </button>
+                        {% endif %}
+                    </a>
+                {% else %}
+                    <h5 class='text-danger'>only logged in users can like posts!!</h5>
+                {% endif %}
                 <hr>
                 <h3>add comments</h3>
                 {% if request.user.is_authenticated %}

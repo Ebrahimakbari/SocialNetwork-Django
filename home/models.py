@@ -43,6 +43,9 @@ class Post(models.Model):
         self.slug = slugify(self.title)
         return super().save()
     
+    def get_likes_count(self):
+        return self.likes.filter(is_liked=True).count()
+    
     def get_absolute_url(self):
         return reverse("home:post_edit", kwargs={"pk": self.pk,"post_slug":self.slug})
     
@@ -61,3 +64,17 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'{self.user} on post {self.post}'
+
+
+class PostLike(models.Model):
+    user = models.ForeignKey(User, related_name='likes', on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name='likes', on_delete=models.CASCADE)
+    is_liked = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now=True)    
+
+    class Meta:
+        verbose_name = ("PostLike")
+        verbose_name_plural = ("PostLikes")
+
+    def __str__(self):
+        return f'user {self.user} liked post {self.post}'

@@ -11,4 +11,5 @@ urlpatterns = [
     path('follow/<int:pk>/',views.FollowingView.as_view(),name='user_follow'),
     path('unfollow/<int:pk>/',views.UnFollowingView.as_view(),name='user_unfollow'),
     path('comment-delete/<int:post_pk>/comment/<int:comment_pk>',views.DeleteCommentView.as_view(),name='delete_comment'),
+    path('post-like/<int:pk>/',views.PostLikeView.as_view(),name='post_like'),
 ]

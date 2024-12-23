@@ -4,3 +4,7 @@
     background-color: #f2f2f2;
 }
 
+.btn-nohover:hover {
+    background-color: var(--bs-btn-bg);     
+    color: var(--bs-btn-color); 
+}
