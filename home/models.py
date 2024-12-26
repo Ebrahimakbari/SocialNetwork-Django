@@ -1,4 +1,3 @@
-from typing import Iterable
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.template.defaultfilters import slugify
@@ -28,7 +27,7 @@ class Post(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(choices=publish_status,default=PUBLISHED)
     
-    objects = models.Manager() 
+    objects = models.Manager()
     published = PostManager()
 
     class Meta:

@@ -15,7 +15,10 @@ User = get_user_model()
 
 class HomeView(View):
     def get(self,request,*args, **kwargs):
+        q = request.GET.get('search', None)
         posts = Post.published.all()
+        if q:
+            posts = Post.published.search(q)
         return render(request, 'home/index.html',context={'posts':posts})
 
 
@@ -29,7 +32,7 @@ class PostDetailView(View):
     
     def get(self,request,*args, **kwargs):
         form = self.form_class()
-        comments = self.post_instance.comments.filter(is_reply=False)
+        comments = self.post_instance.comments.filter(is_reply=False).order_by('-created_at')
         if request.user.is_authenticated:
             post_like = PostLike.objects.filter(user=request.user,post=self.post_instance).first()
         else:

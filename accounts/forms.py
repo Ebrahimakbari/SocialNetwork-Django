@@ -27,7 +27,7 @@ class UserRegistrationForm(forms.Form):
                                 'placeholder':'confirm password'
                                 }))
     
-    def clean(self) -> dict[str, Any]:
+    def clean(self):
         cleaned_data = super().clean()
         password1 = cleaned_data.get('password1', None)
         password2 = cleaned_data.get('password2', None)

@@ -31,9 +31,9 @@
           <a class="nav-link active" href="/admin/">Admin</a>
         </li>
       </ul>
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Search</button>
+      <form class="d-flex" role="search" method="get" action="{% url "home:home" %}">
+        <input name="search" class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <input type="submit" value="Search" class="btn btn-success">
       </form>
   </div>
 </nav>
