@@ -79,6 +79,16 @@ SocialNetwork/
    ```
    python manage.py runserver
    ```
+## Docker:
+1. 
+   ```
+   docker compose up --build
+   ```
+2. 
+   ```
+   docker compose run python manage.py migrate
+   ```
+
 
 ## Key Features
 - User registration and authentication
